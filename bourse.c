@@ -50,6 +50,28 @@ void enfiler(File *file, int quantite)
     }
 }
 
+int defiler(File *file)
+{
+    if (file == NULL)
+    {
+        exit(EXIT_FAILURE);
+    }
+
+    int quantite = 0;
+
+    /* On vérifie s'il y a quelque chose à défiler */
+    if (file->premier != NULL)
+    {
+        Ordre *ordre = file->premier;
+
+        quantite = ordre->nombre;
+        file->premier = ordre->suivant;
+        free(ordre);
+    }
+
+    return quantite;
+}
+
  Action* createAction(int prix,int quantite){
 	 
 	 Action *nouveau = malloc(sizeof(*nouveau));
