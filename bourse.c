@@ -15,10 +15,10 @@ struct File
     Ordre *premier;
 };
 
-typedef struct action action;
-struct action {
-   File achat;
-   File vente;
+typedef struct Action Action;
+struct Action {
+   File *achat;
+   File *vente;
    int prix;
 };
 
@@ -50,11 +50,22 @@ void enfiler(File *file, int quantite)
     }
 }
 
+ Action* createAction(int prix,int quantite){
+	 
+	 Action *nouveau = malloc(sizeof(*nouveau));
+	 nouveau->achat =  malloc(sizeof(nouveau->achat));
+	 nouveau->vente =  malloc(sizeof(nouveau->vente));
+	 nouveau->prix = prix;
+	 enfiler(nouveau->vente,quantite);
+	 return nouveau;
+	 
+ }
 
 int main()
 {
-	
+	Action *action = createAction(10,2000);
 	printf("hello world!\n");
+	printf("%d\n",action->prix);
 	return 0;
 }
 
