@@ -64,7 +64,7 @@ int defiler(File *file)
     {
         Ordre *ordre = file->premier;
 
-        quantite = ordre->nombre;
+        quantite = ordre->quantite;
         file->premier = ordre->suivant;
         free(ordre);
     }
@@ -80,7 +80,18 @@ int defiler(File *file)
 	 nouveau->prix = prix;
 	 enfiler(nouveau->vente,quantite);
 	 return nouveau;
-	 
+ }
+ 
+ 
+ void acheterAction(Action *action,int quantite){
+	 int ordreVente = action->vente->premier->quantite;
+	 if(ordreVente > quantite){
+		 action->vente->premier->quantite = ordreVente-quantite;
+	 }
+	 else{
+		 defiler(action->vente);
+		 acheterAction(action,quantite-ordreVente);
+	 }
  }
 
 int main()
@@ -88,6 +99,8 @@ int main()
 	Action *action = createAction(10,2000);
 	printf("hello world!\n");
 	printf("%d\n",action->prix);
+	acheterAction(action,300);
+	printf("%d\n",action->vente->premier->quantite);
 	return 0;
 }
 
