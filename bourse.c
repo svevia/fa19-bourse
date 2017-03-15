@@ -2,6 +2,9 @@
 #include <stdlib.h>
 
 
+int open = 0; //0 isi bourse est fermé, 1 si ouvert
+
+
 typedef struct Ordre Ordre;
 struct Ordre
 {
@@ -129,6 +132,58 @@ int defiler(File *file)
 	 }
  }
  
+ void printMenu(Action *action){
+	 
+	 printf("MENU\n");
+	 printf("Marché ");
+	 if(open == 1){
+		 printf("Ouvert \n\n");
+	 }
+	 else{
+		 printf("Fermé \n\n");
+	 }
+	 
+	 printf("1.Ouvrir/Fermé marché\n");
+	 printf("2.Placer ordre d'achat\n");
+	 printf("3.Placer ordre de vente\n");
+	 printf("4.Afficher recapitulatif de l'action\n\n");
+	 
+	 
+	 int choix;
+	scanf("%d", &choix);
+	
+	int quantite;
+	switch(choix){
+		case 1:
+		open = 1-open;
+		printMenu(action);
+		break;
+		
+		case 2:
+		printf("Quantité : \n");
+
+		scanf("%d", &quantite);
+		enfiler(action->achat,quantite);
+		printMenu(action);
+		break;
+		
+		case 3:
+		printf("Quantité : \n");
+		scanf("%d", &quantite);
+		enfiler(action->vente,quantite);
+		printMenu(action);
+		break;
+		
+		case 4:
+		printAction(action);
+		printMenu(action);
+		break;
+		
+	}
+	 
+	 
+	 
+ }
 
 int main()
 {
@@ -138,6 +193,9 @@ int main()
 	enfiler(action->achat,2500);
 	enfiler(action->vente,300);
 	printAction(action);
+	printMenu(action);
+	
+	
 	acheterAction(action,2500);
 
 	return 0;
