@@ -20,6 +20,7 @@ struct Action {
    File *achat;
    File *vente;
    int prix;
+   char* nom;
 };
 
 
@@ -72,12 +73,15 @@ int defiler(File *file)
     return quantite;
 }
 
- Action* createAction(int prix,int quantite){
+ Action* createAction(int prix,int quantite, char* nom){
 	 
 	 Action *nouveau = malloc(sizeof(*nouveau));
 	 nouveau->achat =  malloc(sizeof(nouveau->achat));
 	 nouveau->vente =  malloc(sizeof(nouveau->vente));
+	 nouveau->achat->premier = NULL;
+	 nouveau->vente->premier = NULL;
 	 nouveau->prix = prix;
+	 nouveau->nom = nom;
 	 enfiler(nouveau->vente,quantite);
 	 return nouveau;
  }
@@ -86,21 +90,56 @@ int defiler(File *file)
  void acheterAction(Action *action,int quantite){
 	 int ordreVente = action->vente->premier->quantite;
 	 if(ordreVente > quantite){
-		 action->vente->premier->quantite = ordreVente-quantite;
+		 action->vente->premier->quantite = ordreVente-quantite;//Si la valeur d'achat est < à la vente, in reduit l'offre de vente
 	 }
 	 else{
 		 defiler(action->vente);
 		 acheterAction(action,quantite-ordreVente);
 	 }
  }
+ 
+ 
+ void printAction(Action *action){
+	 printf("%s\n",action->nom);
+	 printf("--------------------------------------------------\n");
+	 printf("achat                     | vente                      \n");
+	 printf("--------------------------|-----------------------\n");
+	 Ordre* achatActuel = action->achat->premier;
+	 Ordre* venteActuel = action->vente->premier;
+	 while(achatActuel != NULL || venteActuel != NULL){
+		 if(achatActuel != NULL){
+			 printf("%5d                     |",achatActuel->quantite);
+		 }
+		 else{
+			 printf("                          |");
+		 }
+		 if(venteActuel != NULL){
+			 printf("%5d                 \n",venteActuel->quantite);
+		 }
+		 else{
+			 printf("                      \n");
+		 }
+		 
+		 if(achatActuel!= NULL){
+			achatActuel = achatActuel->suivant;
+		 }
+		 if(venteActuel != NULL){
+			venteActuel = venteActuel->suivant;
+		 }
+	 }
+ }
+ 
 
 int main()
 {
-	Action *action = createAction(10,2000);
-	printf("hello world!\n");
-	printf("%d\n",action->prix);
-	acheterAction(action,300);
-	printf("%d\n",action->vente->premier->quantite);
+	Action *action = createAction(10,2000,"action 1");
+	enfiler(action->vente,1000);
+	enfiler(action->achat,500);
+	enfiler(action->achat,2500);
+	enfiler(action->vente,300);
+	printAction(action);
+	acheterAction(action,2500);
+
 	return 0;
 }
 
