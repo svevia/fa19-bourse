@@ -212,16 +212,9 @@ int defiler(File *file)
 int main()
 {
 	Action *action = createAction(10,2000,"action 1");
-	enfiler(action->vente,1000);
-	enfiler(action->achat,500);
-	enfiler(action->achat,2500);
-	enfiler(action->vente,300);
 	printAction(action);
 	printMenu(action);
 	
-	
-	acheterAction(action,2500);
-
 	return 0;
 }
 
