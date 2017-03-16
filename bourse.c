@@ -132,7 +132,32 @@ int defiler(File *file)
 	 }
  }
  
- void printMenu(Action *action){
+
+ 
+ int countVente(Action *action){
+	 int result = 0;
+	 Ordre* elementActuel = action->vente->premier;
+	         while (elementActuel->suivant != NULL)
+        {
+			result += elementActuel->quantite;
+            elementActuel = elementActuel->suivant;
+        }
+		result += elementActuel->quantite;
+		return result;
+
+ }
+ 
+ 
+ void checkForMove(Action *action){// Si le marché est ouvert, vend les actions tant que c'est possible
+	 if(open == 1){
+		 while(action->achat->premier != NULL && countVente(action)> action->achat->premier->quantite){
+			 acheterAction(action,defiler(action->achat));
+		 }
+	 }
+ }
+
+ 
+  void printMenu(Action *action){
 	 
 	 printf("MENU\n");
 	 printf("Marché ");
@@ -156,7 +181,9 @@ int defiler(File *file)
 	switch(choix){
 		case 1:
 		open = 1-open;
+		checkForMove(action);
 		printMenu(action);
+
 		break;
 		
 		case 2:
@@ -178,13 +205,10 @@ int defiler(File *file)
 		printAction(action);
 		printMenu(action);
 		break;
-		
 	}
-	 
-	 
-	 
  }
-
+ 
+ 
 int main()
 {
 	Action *action = createAction(10,2000,"action 1");
