@@ -91,15 +91,36 @@ int defiler(File *file)
 	 return nouveau;
  }
  
+  int countVente(Action *action){
+	 int result = 0;
+	 Ordre* elementActuel = action->vente->premier;
+	 if(elementActuel == NULL){
+		 return 0;
+	 }
+	 while (elementActuel->suivant != NULL)
+        {
+			result += elementActuel->quantite;
+            elementActuel = elementActuel->suivant;
+        }
+		result += elementActuel->quantite;
+		return result;
+
+ }
  
  void acheterAction(Action *action,int quantite){
 	 int ordreVente = action->vente->premier->quantite;
-	 if(ordreVente > quantite){
-		 action->vente->premier->quantite = ordreVente-quantite;//Si la valeur d'achat est < à la vente, in reduit l'offre de vente
-	 }
-	 else{
-		 defiler(action->vente);
-		 acheterAction(action,quantite-ordreVente);
+	 if(action->vente->premier != NULL){
+		 if(ordreVente > quantite){
+			 action->vente->premier->quantite = ordreVente-quantite;//Si la valeur d'achat est < à la vente, in reduit l'offre de vente
+		 }
+		 else if(ordreVente == quantite){
+			 defiler(action->vente);
+			 defiler(action->achat);
+		 }
+		 else{
+			 defiler(action->vente);
+			 acheterAction(action,quantite-ordreVente);
+		 }
 	 }
  }
  
@@ -135,28 +156,17 @@ int defiler(File *file)
  }
  
 
- 
- int countVente(Action *action){
-	 int result = 0;
-	 Ordre* elementActuel = action->vente->premier;
-	         while (elementActuel->suivant != NULL)
-        {
-			result += elementActuel->quantite;
-            elementActuel = elementActuel->suivant;
-        }
-		result += elementActuel->quantite;
-		return result;
 
- }
  
  
  void checkForMove(Action *action){// Si le marché est ouvert, vend les actions tant que c'est possible
 	 if(open == 1){
-		 while(action->achat->premier != NULL && countVente(action)> action->achat->premier->quantite){
+		 while(action->achat->premier != NULL && countVente(action)>= action->achat->premier->quantite){
 			 acheterAction(action,defiler(action->achat));
 		 }
 	 }
  }
+
 
  
   void printMenu(Action **action, int i){
