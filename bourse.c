@@ -108,14 +108,14 @@ int defiler(File *file)
  }
  
  void acheterAction(Action *action,int quantite){
-	 int ordreVente = action->vente->premier->quantite;
 	 if(action->vente->premier != NULL){
+		 int ordreVente = action->vente->premier->quantite;
 		 if(ordreVente > quantite){
 			 action->vente->premier->quantite = ordreVente-quantite;//Si la valeur d'achat est < à la vente, in reduit l'offre de vente
 		 }
 		 else if(ordreVente == quantite){
 			 defiler(action->vente);
-			 defiler(action->achat);
+			 return;
 		 }
 		 else{
 			 defiler(action->vente);
@@ -161,8 +161,16 @@ int defiler(File *file)
  
  void checkForMove(Action *action){// Si le marché est ouvert, vend les actions tant que c'est possible
 	 if(open == 1){
-		 while(action->achat->premier != NULL && countVente(action)>= action->achat->premier->quantite){
-			 acheterAction(action,defiler(action->achat));
+		 while(action->achat->premier != NULL && action -> vente->premier != NULL){
+			 printf("tour");
+			 if(countVente(action)< action->achat->premier->quantite){
+				 action->achat->premier->quantite = action->achat->premier->quantite - countVente(action);
+				 acheterAction(action,countVente(action));
+			 }
+			 
+			 else{
+				acheterAction(action,defiler(action->achat));
+			 }
 		 }
 	 }
  }
@@ -208,6 +216,7 @@ int defiler(File *file)
 		prix = quantite * action[i]->prix;
 		printf("prix : %f\n",prix);
 		enfiler(action[i]->achat,quantite);
+		checkForMove(action[i]);
 		printMenu(action,i);
 		break;
 		
@@ -219,6 +228,7 @@ int defiler(File *file)
 		printf("prix : %f\n",prix);
 		
 		enfiler(action[i]->vente,quantite);
+		checkForMove(action[i]);
 		printMenu(action,i);
 		break;
 		
