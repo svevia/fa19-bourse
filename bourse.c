@@ -22,10 +22,12 @@ typedef struct Action Action;
 struct Action {
    File *achat;
    File *vente;
-   int prix;
+   double prix;
    char* nom;
 };
 
+
+ void listAction(Action** table);
 
 void enfiler(File *file, int quantite)
 {
@@ -76,7 +78,7 @@ int defiler(File *file)
     return quantite;
 }
 
- Action* createAction(int prix,int quantite, char* nom){
+ Action* createAction(double prix,int quantite, char* nom){
 	 
 	 Action *nouveau = malloc(sizeof(*nouveau));
 	 nouveau->achat =  malloc(sizeof(nouveau->achat));
@@ -102,13 +104,13 @@ int defiler(File *file)
  }
  
  
- void printAction(Action *action){
-	 printf("%s\n",action->nom);
+ void printAction(Action **action, int i){
+	 printf("%s        %.3f€\n",action[i]->nom,action[i]->prix);
 	 printf("--------------------------------------------------\n");
 	 printf("achat                     | vente                      \n");
 	 printf("--------------------------|-----------------------\n");
-	 Ordre* achatActuel = action->achat->premier;
-	 Ordre* venteActuel = action->vente->premier;
+	 Ordre* achatActuel = action[i]->achat->premier;
+	 Ordre* venteActuel = action[i]->vente->premier;
 	 while(achatActuel != NULL || venteActuel != NULL){
 		 if(achatActuel != NULL){
 			 printf("%5d                     |",achatActuel->quantite);
@@ -157,7 +159,7 @@ int defiler(File *file)
  }
 
  
-  void printMenu(Action *action){
+  void printMenu(Action **action, int i){
 	 
 	 printf("MENU\n");
 	 printf("Marché ");
@@ -171,18 +173,20 @@ int defiler(File *file)
 	 printf("1.Ouvrir/Fermé marché\n");
 	 printf("2.Placer ordre d'achat\n");
 	 printf("3.Placer ordre de vente\n");
-	 printf("4.Afficher recapitulatif de l'action\n\n");
+	 printf("4.Afficher recapitulatif de l'action\n");
+	 printf("5.Lister actions\n\n");
 	 
 	 
 	 int choix;
 	scanf("%d", &choix);
 	
 	int quantite;
+	double prix;
 	switch(choix){
 		case 1:
 		open = 1-open;
-		checkForMove(action);
-		printMenu(action);
+		checkForMove(action[i]);
+		printMenu(action,i);
 
 		break;
 		
@@ -190,30 +194,60 @@ int defiler(File *file)
 		printf("Quantité : \n");
 
 		scanf("%d", &quantite);
-		enfiler(action->achat,quantite);
-		printMenu(action);
+		
+		prix = quantite * action[i]->prix;
+		printf("prix : %f\n",prix);
+		enfiler(action[i]->achat,quantite);
+		printMenu(action,i);
 		break;
 		
 		case 3:
 		printf("Quantité : \n");
 		scanf("%d", &quantite);
-		enfiler(action->vente,quantite);
-		printMenu(action);
+
+		prix = quantite * action[i]->prix;
+		printf("prix : %f\n",prix);
+		
+		enfiler(action[i]->vente,quantite);
+		printMenu(action,i);
 		break;
 		
 		case 4:
-		printAction(action);
-		printMenu(action);
+		printAction(action,i);
+		printMenu(action,i);
+		break;
+		
+		case 5:
+		listAction(action);
 		break;
 	}
+ }
+ 
+ void listAction(Action** table){
+	 int i =0;
+	 while(table[i]!=NULL){
+		 printf("%d. %s - %.3f€\n",i,table[i]->nom,table[i]->prix);
+		 i++;
+	 }
+	 
+	  int choix;
+	scanf("%d", &choix);
+	
+	if(choix < 1000 && table[choix] != NULL){
+		printAction(table,choix);
+		printMenu(table,choix);
+	}	 
+	 
+	 
  }
  
  
 int main()
 {
-	Action *action = createAction(10,2000,"action 1");
-	printAction(action);
-	printMenu(action);
+	Action* table[1000];
+	
+	table[0] = createAction(10,2000,"action 1");
+	listAction(table);
 	
 	return 0;
 }
